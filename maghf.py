@@ -5,11 +5,12 @@ class MagHF:
     def __init__(self, ghfmf):
         self.ghfmf = ghfmf
         self.mo_coeff = ghfmf.mo_coeff
+        selr.r = self.ghfmf.mol.intor('int1e_r')
 
         self.nso = self.mo_coeff.shape[0]
         self.nmo = self.nso // 2
 
-    def modify_fock(self, B):
+    def modify_fock(self, E, B):
         I = np.identity(self.nmo)
         zero = np.zeros((self.nmo, self.nmo))
 
@@ -26,9 +27,13 @@ class MagHF:
         sigmaz = np.concatenate([sigmaz1, sigmaz2], axis=0)
 
         Bs = B[0] * sigmax + B[1] * sigmay + B[2] * sigmaz
+        Er = E[0] * self.r[0] + E[1] * self.r[1] + E[2] * self.r[2]
+        Er1 = np.concatnate([Er, zero], axis=1)
+        Er2 = np.concatnate([zero, Er], axis=1)
+        Er = np.concatenate([Er1, Er2], axis=0)
 
         def get_fock(mf):
-            fock = self.ghfmf.get_fock() + Bs
+            fock = self.ghfmf.get_fock() + Bs + Er
             return fock
         
         self.ghfmf.get_fock = get_fock
