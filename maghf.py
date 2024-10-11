@@ -40,8 +40,8 @@ class MagHF:
 
         return
     
-    def kernel(self, B):
-        self.modify_fock(B)
+    def kernel(self, E, B):
+        self.modify_fock(E, B)
         self.ghfmf.kernel()
         return
 
