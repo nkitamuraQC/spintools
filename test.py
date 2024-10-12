@@ -13,6 +13,7 @@ def test_elemaghf():
         basis = '6-31g',
         symmetry = True,
     )
+    mol_O2.spin = 2
 
     mol_CO = gto.M(
         atom = 'C 0 0 0; O 0 0 1.1',  # in Angstrom
