@@ -1,11 +1,12 @@
 from pyscf.scf import ghf
 import numpy as np
+import copy
 
-class MagHF:
+class EleMagHF:
     def __init__(self, ghfmf):
         self.ghfmf = ghfmf
         self.mo_coeff = ghfmf.mo_coeff
-        selr.r = self.ghfmf.mol.intor('int1e_r')
+        self.r = self.ghfmf.mol.intor('int1e_r')
 
         self.nso = self.mo_coeff.shape[0]
         self.nmo = self.nso // 2
@@ -43,6 +44,7 @@ class MagHF:
     def kernel(self, E, B):
         self.modify_fock(E, B)
         self.ghfmf.kernel()
-        return
+        ghfmf = copy.deepcopy(self.ghfmf)
+        return ghfmf
 
     
