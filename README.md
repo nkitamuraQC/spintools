@@ -17,7 +17,3 @@ git clone https://github.com/nkitamuraQC/spindft.git
 cd spindft
 pip install -e .
 ```
-
-- https://arxiv.org/abs/2410.02754
-- 
-- 酸素,二酸化炭素でテスト
