@@ -2,12 +2,13 @@ from elemaghf import EleMagHF
 from pyscf import gto, scf
 import numpy as np
 import copy
+import pytest
 
 def test_elemaghf():
     E0 = np.array([0.0, 0, 0])
     B0 = np.array([0.0, 0, 0])
-    E1 = np.array([0.01, 0, 0])
-    B1 = np.array([0.01, 0, 0])
+    E1 = np.array([10, 10, 10])
+    B1 = np.array([10, 10, 10])
     mol_O2 = gto.M(
         atom = 'O 0 0 0; O 0 0 1.1',  # in Angstrom
         basis = '6-31g',
