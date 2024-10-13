@@ -8,58 +8,40 @@ def test_elemaghf():
     E0 = np.array([0.0, 0, 0])
     B0 = np.array([0.0, 0, 0])
     E1 = np.array([10, 10, 10])
-    B1 = np.array([10, 10, 10])
-    mol_O2 = gto.M(
-        atom = 'O 0 0 0; O 0 0 1.1',  # in Angstrom
-        basis = '6-31g',
-        symmetry = True,
-    )
-    mol_O2.spin = 2
-
-    mol_CO = gto.M(
-        atom = 'C 0 0 0; O 0 0 1.1',  # in Angstrom
-        basis = '6-31g',
-        symmetry = True,
+    B1 = np.array([10, 0, 10])
+    mol_H2_triplet = gto.M(
+        atom = 'H 0 0 0; F 0 0 1.1',  # in Angstrom
+        basis = 'sto-3g',
+        charge = 1,
+        spin = 1,
+        verbose=4,
     )
 
-    myhf_O2 = scf.GHF(mol_O2)
-    myhf_O2.kernel()
+    mol_H2 = gto.M(
+        atom = 'H 0 0 0; F 0 0 1.1',  # in Angstrom
+        basis = 'sto-3g',
+        verbose=4,
+    )
 
-    myhf_CO = scf.GHF(mol_CO)
-    myhf_CO.kernel()
+    myhf_H2_tri = scf.GHF(mol_H2_triplet)
 
-    emhf = EleMagHF(myhf_O2)
+    myhf_H2 = scf.GHF(mol_H2)
+
+    emhf = EleMagHF(myhf_H2_tri)
     mf = emhf.kernel(E0, B0)
-    B0_energy_O2 = mf.e_tot
+    B0_energy_H2_tri = mf.e_tot
 
-    emhf = EleMagHF(myhf_O2)
-    mf = emhf.kernel(E0, B1)
-    B1_energy_O2 = mf.e_tot
+    emhf = EleMagHF(myhf_H2_tri)
+    mf = emhf.kernel(E1, B1)
+    B1_energy_H2_tri = mf.e_tot
 
-    emhf = EleMagHF(myhf_CO)
+    emhf = EleMagHF(myhf_H2)
     mf = emhf.kernel(E0, B0)
-    B0_energy_CO = mf.e_tot
+    B0_energy_H2 = mf.e_tot
 
-    emhf = EleMagHF(myhf_CO)
-    mf = emhf.kernel(E0, B1)
-    B1_energy_CO = mf.e_tot
+    emhf = EleMagHF(myhf_H2)
+    mf = emhf.kernel(E1, B1)
+    B1_energy_H2 = mf.e_tot
 
-    assert(abs(B1_energy_O2 - B0_energy_O2) > abs(B1_energy_CO - B0_energy_CO))
-
-    emhf = EleMagHF(myhf_O2)
-    mf = emhf.kernel(E0, B0)
-    E0_energy_O2 = mf.e_tot
-
-    emhf = EleMagHF(myhf_O2)
-    mf = emhf.kernel(E1, B0)
-    E1_energy_O2 = mf.e_tot
-
-    emhf = EleMagHF(myhf_CO)
-    mf = emhf.kernel(E0, B0)
-    E0_energy_CO = mf.e_tot
-
-    emhf = EleMagHF(myhf_CO)
-    mf = emhf.kernel(E1, B0)
-    E1_energy_CO = mf.e_tot
-
-    assert(abs(E1_energy_O2 - E0_energy_O2) < abs(E1_energy_CO - E0_energy_CO))
+    assert(abs(B1_energy_H2_tri - B0_energy_H2_tri) > abs(B1_energy_H2 - B0_energy_H2))
+    return

@@ -9,7 +9,7 @@ class EleMagHF:
         self.mo_coeff = ghfmf.mo_coeff
         self.r = self.ghfmf.mol.intor('int1e_r')
 
-        self.nso = self.mo_coeff.shape[0]
+        self.nso = len(ghfmf.mol.ao_labels()) * 2
         self.nmo = self.nso // 2
 
         self.original_get_fock = self.ghfmf.get_fock
@@ -39,10 +39,12 @@ class EleMagHF:
         Er2 = np.concatenate([zero, Er], axis=1)
         Er = np.concatenate([Er1, Er2], axis=0)
 
+        print("Bs =", Bs)
+        print("Er =", Er)
+
         def custom_get_fock(h1e, s1e, vhf, dm):
             fock_matrix = self.original_get_fock(h1e, s1e, vhf, dm)
             fock_matrix += Bs + Er
-            print(fock_matrix)
             return fock_matrix
         
         self.ghfmf.get_fock = custom_get_fock
