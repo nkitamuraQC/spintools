@@ -42,6 +42,7 @@ class EleMagHF:
         def custom_get_fock(h1e, s1e, vhf, dm):
             fock_matrix = self.original_get_fock(h1e, s1e, vhf, dm)
             fock_matrix += Bs + Er
+            print(fock_matrix)
             return fock_matrix
         
         self.ghfmf.get_fock = custom_get_fock
