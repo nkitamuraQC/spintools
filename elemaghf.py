@@ -39,12 +39,14 @@ class EleMagHF:
         Er2 = np.concatenate([zero, Er], axis=1)
         Er = np.concatenate([Er1, Er2], axis=0)
 
-        print("Bs =", Bs)
-        print("Er =", Er)
+        #print("Bs =", Bs)
+        #print("Er =", Er)
 
         def custom_get_fock(h1e, s1e, vhf, dm):
             fock_matrix = self.original_get_fock(h1e, s1e, vhf, dm)
+            # print("Before: ", fock_matrix)
             fock_matrix += Bs + Er
+            # print("After: ", fock_matrix)
             return fock_matrix
         
         self.ghfmf.get_fock = custom_get_fock
@@ -56,8 +58,7 @@ class EleMagHF:
     
     def kernel(self, E, B):
         self.modify_fock(E, B)
-        kernel(self.ghfmf)
-        ghfmf = copy.deepcopy(self.ghfmf)
-        return ghfmf
+        scf_conv, e_tot, mo_energy, mo_coeff, mo_occ = kernel(self.ghfmf)
+        return scf_conv, e_tot, mo_energy, mo_coeff, mo_occ
 
     
