@@ -8,12 +8,12 @@ def load_requirements(file_name):
 
 
 setup(
-    name="spinqc",
+    name="spintools",
     version="0.1",
     packages=find_packages(),
     install_requires=load_requirements("requirements.txt"),
     author="Naoki Kitamura",
-    url="https://github.com/nkitamuraQC/spinqc.git",
+    url="https://github.com/nkitamuraQC/spintools.git",
     tests_require=[
         "pytest",  # pytestをテストに使う
     ],
