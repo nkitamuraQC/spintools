@@ -1,4 +1,4 @@
-from elemaghf import EleMagHF
+from spinqc.elemaghf import EleMagHF
 from pyscf import gto, scf
 import numpy as np
 import copy
