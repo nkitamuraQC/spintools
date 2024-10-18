@@ -1,5 +1,5 @@
 # spintools
-spintools is a Python package for application of electro-magnetic field to materials with quantum chemical calculations.
+spintools is a Python package for application of electric-magnetic field to materials with quantum chemical calculations.
 
 ## Features
 - Application of electro-magnetic field to materials with quantum chemical calculations
