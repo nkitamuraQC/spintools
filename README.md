@@ -11,9 +11,9 @@ See test.py
 ## Installation
 
 ```shell
-conda create -n spindft python=3.9
-conda activate spindft
-git clone https://github.com/nkitamuraQC/spindft.git
-cd spindft
+conda create -n spintools python=3.9
+conda activate spintools
+git clone https://github.com/nkitamuraQC/spintools.git
+cd spintools
 pip install -e .
 ```
