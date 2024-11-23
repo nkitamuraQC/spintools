@@ -1,7 +1,7 @@
 from pyscf.scf import ghf
 import numpy as np
 import copy
-from mod_kernel import kernel
+from spinqc.mod_kernel import kernel
 
 class EleMagHF:
     def __init__(self, ghfmf):
