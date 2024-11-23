@@ -16,9 +16,9 @@
 # Author: Qiming Sun <osirpt.sun@gmail.com>
 #
 
-'''
+"""
 Hartree-Fock
-'''
+"""
 
 import sys
 import tempfile
@@ -38,15 +38,24 @@ from pyscf.data import nist
 from pyscf import __config__
 
 
-WITH_META_LOWDIN = getattr(__config__, 'scf_analyze_with_meta_lowdin', True)
-PRE_ORTH_METHOD = getattr(__config__, 'scf_analyze_pre_orth_method', 'ANO')
-MO_BASE = getattr(__config__, 'MO_BASE', 1)
-TIGHT_GRAD_CONV_TOL = getattr(__config__, 'scf_hf_kernel_tight_grad_conv_tol', True)
-MUTE_CHKFILE = getattr(__config__, 'scf_hf_SCF_mute_chkfile', False)
+WITH_META_LOWDIN = getattr(__config__, "scf_analyze_with_meta_lowdin", True)
+PRE_ORTH_METHOD = getattr(__config__, "scf_analyze_pre_orth_method", "ANO")
+MO_BASE = getattr(__config__, "MO_BASE", 1)
+TIGHT_GRAD_CONV_TOL = getattr(__config__, "scf_hf_kernel_tight_grad_conv_tol", True)
+MUTE_CHKFILE = getattr(__config__, "scf_hf_SCF_mute_chkfile", False)
 
-def kernel(mf, conv_tol=1e-10, conv_tol_grad=None,
-           dump_chk=True, dm0=None, callback=None, conv_check=True, **kwargs):
-    '''kernel: the SCF driver.
+
+def kernel(
+    mf,
+    conv_tol=1e-10,
+    conv_tol_grad=None,
+    dump_chk=True,
+    dm0=None,
+    callback=None,
+    conv_check=True,
+    **kwargs
+):
+    """kernel: the SCF driver.
 
     Args:
         mf : an instance of SCF class
@@ -107,15 +116,17 @@ def kernel(mf, conv_tol=1e-10, conv_tol_grad=None,
     >>> conv, e, mo_e, mo, mo_occ = scf.hf.kernel(scf.hf.SCF(mol), dm0=numpy.eye(mol.nao_nr()))
     >>> print('conv = %s, E(HF) = %.12f' % (conv, e))
     conv = True, E(HF) = -1.081170784378
-    '''
-    if 'init_dm' in kwargs:
-        raise RuntimeError('''
+    """
+    if "init_dm" in kwargs:
+        raise RuntimeError(
+            '''
 You see this error message because of the API updates in pyscf v0.11.
-Keyword argument "init_dm" is replaced by "dm0"''')
+Keyword argument "init_dm" is replaced by "dm0"'''
+        )
     cput0 = (logger.process_clock(), logger.perf_counter())
     if conv_tol_grad is None:
         conv_tol_grad = numpy.sqrt(conv_tol)
-        logger.info(mf, 'Set gradient conv threshold to %g', conv_tol_grad)
+        logger.info(mf, "Set gradient conv threshold to %g", conv_tol_grad)
 
     mol = mf.mol
     s1e = mf.get_ovlp(mol)
@@ -128,7 +139,7 @@ Keyword argument "init_dm" is replaced by "dm0"''')
     h1e = mf.get_hcore(mol)
     vhf = mf.get_veff(mol, dm)
     e_tot = mf.energy_tot(dm, h1e, vhf)
-    logger.info(mf, 'init E= %.15g', e_tot)
+    logger.info(mf, "init E= %.15g", e_tot)
 
     scf_conv = False
     mo_energy = mo_coeff = mo_occ = None
@@ -166,7 +177,7 @@ Keyword argument "init_dm" is replaced by "dm0"''')
     mf.pre_kernel(locals())
 
     fock_last = None
-    cput1 = logger.timer(mf, 'initialize scf', *cput0)
+    cput1 = logger.timer(mf, "initialize scf", *cput0)
     mf.cycles = 0
     for cycle in range(mf.max_cycle):
         dm_last = dm
@@ -188,13 +199,20 @@ Keyword argument "init_dm" is replaced by "dm0"''')
         norm_gorb = numpy.linalg.norm(mf.get_grad(mo_coeff, mo_occ, fock))
         if not TIGHT_GRAD_CONV_TOL:
             norm_gorb = norm_gorb / numpy.sqrt(norm_gorb.size)
-        norm_ddm = numpy.linalg.norm(dm-dm_last)
-        logger.info(mf, 'cycle= %d E= %.15g  delta_E= %4.3g  |g|= %4.3g  |ddm|= %4.3g',
-                    cycle+1, e_tot, e_tot-last_hf_e, norm_gorb, norm_ddm)
+        norm_ddm = numpy.linalg.norm(dm - dm_last)
+        logger.info(
+            mf,
+            "cycle= %d E= %.15g  delta_E= %4.3g  |g|= %4.3g  |ddm|= %4.3g",
+            cycle + 1,
+            e_tot,
+            e_tot - last_hf_e,
+            norm_gorb,
+            norm_ddm,
+        )
 
         if callable(mf.check_convergence):
             scf_conv = mf.check_convergence(locals())
-        elif abs(e_tot-last_hf_e) < conv_tol and norm_gorb < conv_tol_grad:
+        elif abs(e_tot - last_hf_e) < conv_tol and norm_gorb < conv_tol_grad:
             scf_conv = True
 
         if dump_chk and mf.chkfile:
@@ -203,7 +221,7 @@ Keyword argument "init_dm" is replaced by "dm0"''')
         if callable(callback):
             callback(locals())
 
-        cput1 = logger.timer(mf, 'cycle= %d'%(cycle+1), *cput1)
+        cput1 = logger.timer(mf, "cycle= %d" % (cycle + 1), *cput1)
 
         if scf_conv:
             break
@@ -211,7 +229,7 @@ Keyword argument "init_dm" is replaced by "dm0"''')
     mf.cycles = cycle + 1
     if scf_conv and conv_check:
         # An extra diagonalization, to remove level shift
-        #fock = mf.get_fock(h1e, s1e, vhf, dm)  # = h1e + vhf
+        # fock = mf.get_fock(h1e, s1e, vhf, dm)  # = h1e + vhf
         mo_energy, mo_coeff = mf.eig(fock, s1e)
         mo_occ = mf.get_occ(mo_energy, mo_coeff)
         dm, dm_last = mf.make_rdm1(mo_coeff, mo_occ), dm
@@ -222,20 +240,26 @@ Keyword argument "init_dm" is replaced by "dm0"''')
         norm_gorb = numpy.linalg.norm(mf.get_grad(mo_coeff, mo_occ, fock))
         if not TIGHT_GRAD_CONV_TOL:
             norm_gorb = norm_gorb / numpy.sqrt(norm_gorb.size)
-        norm_ddm = numpy.linalg.norm(dm-dm_last)
+        norm_ddm = numpy.linalg.norm(dm - dm_last)
 
         conv_tol = conv_tol * 10
         conv_tol_grad = conv_tol_grad * 3
         if callable(mf.check_convergence):
             scf_conv = mf.check_convergence(locals())
-        elif abs(e_tot-last_hf_e) < conv_tol or norm_gorb < conv_tol_grad:
+        elif abs(e_tot - last_hf_e) < conv_tol or norm_gorb < conv_tol_grad:
             scf_conv = True
-        logger.info(mf, 'Extra cycle  E= %.15g  delta_E= %4.3g  |g|= %4.3g  |ddm|= %4.3g',
-                    e_tot, e_tot-last_hf_e, norm_gorb, norm_ddm)
+        logger.info(
+            mf,
+            "Extra cycle  E= %.15g  delta_E= %4.3g  |g|= %4.3g  |ddm|= %4.3g",
+            e_tot,
+            e_tot - last_hf_e,
+            norm_gorb,
+            norm_ddm,
+        )
         if dump_chk and mf.chkfile:
             mf.dump_chk(locals())
 
-    logger.timer(mf, 'scf_cycle', *cput0)
+    logger.timer(mf, "scf_cycle", *cput0)
     # A post-processing hook before return
     mf.post_kernel(locals())
     return scf_conv, e_tot, mo_energy, mo_coeff, mo_occ
